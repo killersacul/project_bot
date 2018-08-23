@@ -1,11 +1,11 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const blizzard = require('blizzard.js').initialize({ apikey: "bkg8dut5nm4j8zt4nv3xe5qqee8jhfxn" });
 const fs = require('fs');
-const { prefix, token } = require('./config.json');
-client.commands = new Discord.Collection();
-
+const { prefix, token, blizzToken } = require('./config.json');
+const blizzard = require('blizzard.js').initialize({ apikey: blizzToken });
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+const newUsers = new Discord.Collection();
+client.commands = new Discord.Collection();
 
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`);
@@ -18,6 +18,10 @@ client.on('ready', () => {
 
 const realm = "Khaz Modan";
 const region = "eu";
+
+client.on("guildMemberAdd", (member) => {
+  newUsers.set(member.id, member.user);
+});
 
 client.on('message', message => {
     if (!message.content.startsWith(prefix) || message.author.bot) return;
